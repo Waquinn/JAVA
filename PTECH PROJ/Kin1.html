@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Parking Queue (FCFS)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff0f6;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #a05278;
+    }
+
+    h1 {
+      color: #d63384;
+    }
+
+    .parking-container {
+      background: #ffe3ec;
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      width: 320px;
+      box-shadow: 0 4px 8px rgba(214, 51, 132, 0.1);
+    }
+
+    .parking-lot {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    .parking-lot li {
+      background: #fff;
+      margin: 0.5rem 0;
+      padding: 0.8rem;
+      border-radius: 1rem;
+      border: 1px solid #f8d7e1;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    button {
+      margin: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 1rem;
+      background-color: #f783ac;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #f06595;
+    }
+  </style>
+</head>
+<body>
+  <h1>🏦 Parking Queue</h1>
+  <div class="parking-container">
+    <button onclick="arriveCar()">🚗 Arrive</button>
+    <button onclick="leaveCar()">🏋️ Leave</button>
+    <ul class="parking-lot" id="parkingLot"></ul>
+  </div>
+
+  <script>
+    let parkingQueue = [];
+    let carNumber = 1;
+
+    function arriveCar() {
+      const car = `Car #${carNumber++}`;
+      parkingQueue.push(car);
+      renderParkingLot();
+    }
+
+    function leaveCar() {
+      if (parkingQueue.length > 0) {
+        alert(`${parkingQueue[0]} has left the parking lot.`);
+        parkingQueue.shift();
+        renderParkingLot();
+      } else {
+        alert('No cars in the parking lot!');
+      }
+    }
+
+    function renderParkingLot() {
+      const parkingLot = document.getElementById('parkingLot');
+      parkingLot.innerHTML = '';
+      parkingQueue.forEach((car) => {
+        const li = document.createElement('li');
+        li.textContent = car;
+        parkingLot.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>

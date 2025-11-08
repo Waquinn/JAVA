@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sweet Delights Bakery Queue</title>
+    <style>
+        :root {
+            --pink: #ffb6c1;
+            --light-pink: #ffdfe6;
+            --dark-pink: #d88a96;
+            --white: #fff9fa;
+            --brown: #8b5a2b;
+        }
+        
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: var(--white);
+            color: var(--brown);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            color: var(--dark-pink);
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .subtitle {
+            color: var(--brown);
+            margin-bottom: 30px;
+            font-style: italic;
+        }
+        
+        .bakery-image {
+            width: 150px;
+            height: 150px;
+            margin: 20px auto;
+            background-color: var(--light-pink);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border: 5px solid var(--pink);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .bakery-image::before {
+            content: "🍰";
+            font-size: 70px;
+        }
+        
+        .queue-container {
+            background-color: var(--light-pink);
+            border-radius: 15px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border: 2px solid var(--pink);
+        }
+        
+        .queue-title {
+            color: var(--dark-pink);
+            margin-top: 0;
+        }
+        
+        .queue-list {
+            list-style-type: none;
+            padding: 0;
+            min-height: 200px;
+        }
+        
+        .customer {
+            background-color: white;
+            margin: 10px auto;
+            padding: 12px;
+            border-radius: 50px;
+            width: 80%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-left: 5px solid var(--pink);
+            transition: all 0.3s ease;
+        }
+        
+        .customer:hover {
+            transform: scale(1.02);
+            background-color: var(--white);
+        }
+        
+        .customer-number {
+            background-color: var(--pink);
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+        }
+        
+        .customer-name {
+            flex-grow: 1;
+            text-align: left;
+            padding-left: 15px;
+        }
+        
+        .customer-emoji {
+            font-size: 20px;
+        }
+        
+        .controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        button {
+            background-color: var(--pink);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        button:hover {
+            background-color: var(--dark-pink);
+            transform: translateY(-2px);
+        }
+        
+        input {
+            padding: 10px;
+            border: 2px solid var(--pink);
+            border-radius: 50px;
+            font-family: inherit;
+            width: 200px;
+            text-align: center;
+        }
+        
+        .serving {
+            background-color: #f0fff0;
+            border-left: 5px solid #98fb98;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+            100% { transform: scale(1); }
+        }
+        
+        .empty-queue {
+            color: var(--dark-pink);
+            font-style: italic;
+            padding: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Sweet Delights Bakery</h1>
+    <div class="subtitle">First Come, First Served Queue System</div>
+    
+    <div class="bakery-image"></div>
+    
+    <div class="queue-container">
+        <h2 class="queue-title">Current Queue</h2>
+        <ul class="queue-list" id="queueList">
+            <li class="empty-queue">No customers in queue yet</li>
+        </ul>
+    </div>
+    
+    <div class="controls">
+        <input type="text" id="customerName" placeholder="Enter customer name" maxlength="20">
+        <button id="addCustomer">Add Customer</button>
+        <button id="serveCustomer">Serve Next</button>
+    </div>
+    
+    <script>
+        const queue = [];
+        const queueList = document.getElementById('queueList');
+        const customerNameInput = document.getElementById('customerName');
+        const addCustomerBtn = document.getElementById('addCustomer');
+        const serveCustomerBtn = document.getElementById('serveCustomer');
+        
+        // Emojis for customers
+        const customerEmojis = ['👩', '👧', '🧁', '🍪', '🍩', '🥐', '🍞', '🎂', '🍰', '🧑'];
+        
+        function updateQueueDisplay() {
+            queueList.innerHTML = '';
+            
+            if (queue.length === 0) {
+                queueList.innerHTML = '<li class="empty-queue">No customers in queue yet</li>';
+                return;
+            }
+            
+            queue.forEach((customer, index) => {
+                const li = document.createElement('li');
+                li.className = 'customer';
+                if (index === 0) {
+                    li.classList.add('serving');
+                }
+                
+                li.innerHTML = `
+                    <div class="customer-number">${index + 1}</div>
+                    <div class="customer-name">${customer.name}</div>
+                    <div class="customer-emoji">${customer.emoji}</div>
+                `;
+                
+                queueList.appendChild(li);
+            });
+        }
+        
+        function addCustomer() {
+            const name = customerNameInput.value.trim();
+            if (!name) {
+                alert('Please enter a customer name');
+                return;
+            }
+            
+            const randomEmoji = customerEmojis[Math.floor(Math.random() * customerEmojis.length)];
+            queue.push({ name, emoji: randomEmoji });
+            customerNameInput.value = '';
+            updateQueueDisplay();
+        }
+        
+        function serveCustomer() {
+            if (queue.length === 0) {
+                alert('No customers to serve!');
+                return;
+            }
+            
+            const servedCustomer = queue.shift();
+            alert(`Now serving: ${servedCustomer.name} ${servedCustomer.emoji}`);
+            updateQueueDisplay();
+        }
+        
+        addCustomerBtn.addEventListener('click', addCustomer);
+        serveCustomerBtn.addEventListener('click', serveCustomer);
+        
+        customerNameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                addCustomer();
+            }
+        });
+        
+        // Initial display
+        updateQueueDisplay();
+    </script>
+</body>
+</html>

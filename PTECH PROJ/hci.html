@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mike's InfoConnect System</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: Arial, sans-serif;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      background-color: #d6d6ce;
+    }
+
+    .container {
+      display: flex;
+      flex: 1;
+    }
+
+    .sidebar {
+      width: 250px;
+      background-color: #2c3e50;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      padding: 20px;
+    }
+
+    .sidebar img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      margin-bottom: 10px;
+    }
+
+    .sidebar h2 {
+      font-size: 18px;
+      margin-bottom: 20px;
+    }
+
+    .sidebar a {
+      color: white;
+      text-decoration: none;
+      margin: 10px 0;
+      font-size: 16px;
+      transition: 0.3s;
+      cursor: pointer;
+    }
+
+    .sidebar a:hover,
+    .sidebar a.active {
+      text-decoration: underline;
+      font-weight: bold;
+    }
+
+    .main {
+      flex: 1;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .content-section {
+      display: none;
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      margin-bottom: 20px;
+    }
+
+    .content-section.active {
+      display: block;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .form-group label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+
+    .form-group input, .form-group select {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+    }
+
+    .btn {
+      background-color: #27ae60;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+    }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 20px;
+      border: 2px solid #27ae60;
+      border-radius: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
+
+    @media (max-width: 768px) {
+      .container {
+        flex-direction: column;
+      }
+
+      .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+      }
+
+      .sidebar a {
+        flex: 1;
+        text-align: center;
+        font-size: 14px;
+      }
+
+      .main {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="sidebar">
+      <img src="https://via.placeholder.com/100" alt="Mike's Profile">
+      <h2>Mike Bru</h2>
+      <a class="menu-link active" data-target="dashboard">Dashboard</a>
+      <a class="menu-link" data-target="search">Search</a>
+      <a class="menu-link" data-target="add-info">Add Info</a>
+      <a class="menu-link" data-target="edit-info">Edit Info</a>
+      <a class="menu-link" data-target="messages">Messages</a>
+      <a class="menu-link" data-target="mail">Mail</a>
+      <a class="menu-link" data-target="buyer-settings">Buyer Settings</a>
+      <a class="menu-link" data-target="seller-settings">Seller Settings</a>
+      <a class="menu-link" data-target="notifications">Notifications</a>
+      <a class="menu-link" data-target="forgot-password">Forgot Password</a>
+      <a class="menu-link" data-target="logout">Logout</a>
+    </div>
+
+    <div class="main">
+      <div class="content-section active" id="dashboard">
+        <h3>Welcome to Mike's InfoConnect System</h3>
+        <p>This is your dashboard.</p>
+      </div>
+
+      <div class="content-section" id="search">
+        <h3>Search User</h3>
+        <div class="form-group">
+          <label for="search">Search by Name, Last-Name or ID</label>
+          <input type="text" id="search" placeholder="Enter search term...">
+        </div>
+        <button class="btn">Search</button>
+      </div>
+
+      <div class="content-section" id="add-info">
+        <h3>Add Personal Information</h3>
+        <div class="form-group">
+          <label for="name">Name</label>
+          <input type="text" id="name" placeholder="Enter full name">
+        </div>
+        <div class="form-group">
+          <label for="sex">Sex</label>
+          <select id="sex">
+            <option value="">Select</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="age">Age</label>
+          <input type="number" id="age" placeholder="Enter age">
+        </div>
+        <div class="form-group">
+          <label for="address">Address</label>
+          <input type="text" id="address" placeholder="Enter address">
+        </div>
+        <div class="form-group">
+          <label for="occupation">Occupation</label>
+          <input type="text" id="occupation" placeholder="Enter occupation">
+        </div>
+        <div class="form-group">
+          <label for="cellphone">Cellphone Number</label>
+          <input type="text" id="cellphone" placeholder="Enter cellphone number">
+        </div>
+        <div class="form-group">
+          <label for="status">Marital Status</label>
+          <select id="status">
+            <option value="">Select</option>
+            <option value="Single">Single</option>
+            <option value="Married">Married</option>
+            <option value="Widowed">Widowed</option>
+          </select>
+        </div>
+        <button class="btn" onclick="saveInfo()">Save</button>
+      </div>
+
+      <div class="content-section" id="edit-info">
+        <h3>Edit Personal Information</h3>
+        <div class="form-group">
+          <label for="edit-name">Name</label>
+          <input type="text" id="edit-name" value="Juan Dela Cruz">
+        </div>
+        <div class="form-group">
+          <label for="edit-sex">Sex</label>
+          <select id="edit-sex">
+            <option value="Male" selected>Male</option>
+            <option value="Female">Female</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="edit-age">Age</label>
+          <input type="number" id="edit-age" value="30">
+        </div>
+        <div class="form-group">
+          <label for="edit-address">Address</label>
+          <input type="text" id="edit-address" value="123 Sampaguita St., Quezon City">
+        </div>
+        <div class="form-group">
+          <label for="edit-occupation">Occupation</label>
+          <input type="text" id="edit-occupation" value="Web Developer">
+        </div>
+        <div class="form-group">
+          <label for="edit-cellphone">Cellphone Number</label>
+          <input type="text" id="edit-cellphone" value="09171234567">
+        </div>
+        <div class="form-group">
+          <label for="edit-status">Marital Status</label>
+          <select id="edit-status">
+            <option value="Single">Single</option>
+            <option value="Married" selected>Married</option>
+            <option value="Widowed">Widowed</option>
+          </select>
+        </div>
+        <button class="btn" onclick="updateInfo()">Update</button>
+      </div>
+      
+
+      <div class="content-section" id="messages">
+        <h3>Messages</h3>
+        <p>No new messages.</p>
+      </div>
+
+      <div class="content-section" id="mail">
+        <h3>Mail</h3>
+        <p>Your inbox is empty.</p>
+      </div>
+
+      <div class="content-section" id="buyer-settings">
+        <h3>Buyer Settings</h3>
+        <p>Configure buyer settings here.</p>
+      </div>
+
+      <div class="content-section" id="seller-settings">
+        <h3>Seller Settings</h3>
+        <p>Configure seller settings here.</p>
+      </div>
+
+      <div class="content-section" id="notifications">
+        <h3>Notifications</h3>
+        <p>No new notifications.</p>
+      </div>
+
+      <div class="content-section" id="forgot-password">
+        <h3>Forgot Password</h3>
+        <p>Password recovery options.</p>
+      </div>
+
+      <div class="content-section" id="logout">
+        <h3>Logout</h3>
+        <p>You have been logged out.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="popup" id="popup">Information Saved Successfully!</div>
+
+  <script>
+    function saveInfo() {
+      const popup = document.getElementById("popup");
+      popup.style.display = "block";
+      setTimeout(() => {
+        popup.style.display = "none";
+      }, 2000);
+    }
+
+    const links = document.querySelectorAll('.menu-link');
+    const sections = document.querySelectorAll('.content-section');
+
+    links.forEach(link => {
+      link.addEventListener('click', () => {
+        const target = link.getAttribute('data-target');
+
+        sections.forEach(section => {
+          section.classList.remove('active');
+        });
+
+        links.forEach(l => l.classList.remove('active'));
+        link.classList.add('active');
+
+        const targetSection = document.getElementById(target);
+        if (targetSection) targetSection.classList.add('active');
+      });
+    });
+  </script>
+</body>
+</html>

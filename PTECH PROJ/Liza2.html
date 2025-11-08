@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Call Center Queue System</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #3498db;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #e74c3c;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: var(--dark);
+            background-color: #f5f7fa;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 1.8rem;
+            font-weight: 500;
+        }
+        
+        .subtitle {
+            margin: 5px 0 0;
+            font-weight: 300;
+            opacity: 0.9;
+        }
+        
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            padding: 20px;
+        }
+        
+        .queue-container, .stats-container {
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 15px;
+        }
+        
+        .section-title {
+            font-size: 1.2rem;
+            margin-top: 0;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: var(--primary);
+        }
+        
+        .queue-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .caller-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px 15px;
+            margin-bottom: 8px;
+            background-color: var(--light);
+            border-radius: 4px;
+            transition: all 0.2s;
+        }
+        
+        .caller-item.active {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .caller-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .caller-number {
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        
+        .caller-time {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+        
+        .caller-status {
+            font-size: 0.8rem;
+            padding: 3px 8px;
+            border-radius: 12px;
+            background-color: var(--warning);
+            color: white;
+        }
+        
+        .caller-status.answered {
+            background-color: var(--success);
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .stat-card {
+            background-color: var(--light);
+            padding: 15px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 300;
+            margin: 5px 0;
+            color: var(--primary);
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #7f8c8d;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background-color: var(--secondary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #2980b9;
+        }
+        
+        .btn-success {
+            background-color: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background-color: #219955;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c0392b;
+        }
+        
+        .empty-queue {
+            text-align: center;
+            padding: 20px;
+            color: #95a5a6;
+            font-style: italic;
+        }
+        
+        .agent-status {
+            display: flex;
+            align-items: center;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid #eee;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-available {
+            background-color: var(--success);
+        }
+        
+        .status-busy {
+            background-color: var(--danger);
+        }
+        
+        .call-timer {
+            font-family: monospace;
+            font-size: 1.2rem;
+            margin-left: auto;
+        }
+        
+        @media (max-width: 768px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Call Center Queue System</h1>
+            <p class="subtitle">First Come, First Serve (FCFS) Implementation</p>
+        </header>
+        
+        <div class="dashboard">
+            <div class="queue-container">
+                <h2 class="section-title">Call Queue</h2>
+                <ul class="queue-list" id="queueList">
+                    <li class="empty-queue">No calls in queue</li>
+                </ul>
+                
+                <div class="controls">
+                    <button class="btn-primary" id="addCallBtn">Add Call</button>
+                    <button class="btn-success" id="answerCallBtn" disabled>Answer Call</button>
+                </div>
+            </div>
+            
+            <div class="stats-container">
+                <h2 class="section-title">Statistics</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="totalCalls">0</div>
+                        <div class="stat-label">Total Calls Today</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="waitingCalls">0</div>
+                        <div class="stat-label">Waiting Calls</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="avgWaitTime">0:00</div>
+                        <div class="stat-label">Avg Wait Time</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="answeredCalls">0</div>
+                        <div class="stat-label">Answered Calls</div>
+                    </div>
+                </div>
+                
+                <div class="agent-status">
+                    <div class="status-indicator status-available" id="statusIndicator"></div>
+                    <span id="statusText">Available</span>
+                    <div class="call-timer" id="callTimer">00:00</div>
+                </div>
+                
+                <div class="controls">
+                    <button class="btn-danger" id="endCallBtn" disabled>End Call</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // System variables
+        const callQueue = [];
+        let activeCall = null;
+        let callTimerInterval = null;
+        let callCounter = 0;
+        let totalWaitTime = 0;
+        let answeredCalls = 0;
+        
+        // DOM elements
+        const queueList = document.getElementById('queueList');
+        const addCallBtn = document.getElementById('addCallBtn');
+        const answerCallBtn = document.getElementById('answerCallBtn');
+        const endCallBtn = document.getElementById('endCallBtn');
+        const statusIndicator = document.getElementById('statusIndicator');
+        const statusText = document.getElementById('statusText');
+        const callTimer = document.getElementById('callTimer');
+        const totalCallsEl = document.getElementById('totalCalls');
+        const waitingCallsEl = document.getElementById('waitingCalls');
+        const avgWaitTimeEl = document.getElementById('avgWaitTime');
+        const answeredCallsEl = document.getElementById('answeredCalls');
+        
+        // Initialize
+        updateQueueDisplay();
+        updateStats();
+        
+        // Event listeners
+        addCallBtn.addEventListener('click', addNewCall);
+        answerCallBtn.addEventListener('click', answerNextCall);
+        endCallBtn.addEventListener('click', endCurrentCall);
+        
+        // Functions
+        function addNewCall() {
+            callCounter++;
+            const callId = `C${callCounter.toString().padStart(4, '0')}`;
+            const callTime = new Date();
+            
+            const newCall = {
+                id: callId,
+                time: callTime,
+                status: 'waiting'
+            };
+            
+            callQueue.push(newCall);
+            updateQueueDisplay();
+            updateStats();
+            
+            // Enable answer button if agent is available
+            if (!activeCall) {
+                answerCallBtn.disabled = false;
+            }
+        }
+        
+        function answerNextCall() {
+            if (callQueue.length === 0 || activeCall) return;
+            
+            activeCall = callQueue.shift();
+            activeCall.status = 'active';
+            activeCall.answerTime = new Date();
+            
+            // Calculate wait time in seconds
+            const waitTime = Math.floor((activeCall.answerTime - activeCall.time) / 1000);
+            totalWaitTime += waitTime;
+            
+            answeredCalls++;
+            
+            // Update agent status
+            statusIndicator.className = 'status-indicator status-busy';
+            statusText.textContent = 'On Call: ' + activeCall.id;
+            
+            // Start call timer
+            startCallTimer();
+            
+            // Update UI
+            updateQueueDisplay();
+            updateStats();
+            answerCallBtn.disabled = true;
+            endCallBtn.disabled = false;
+        }
+        
+        function endCurrentCall() {
+            if (!activeCall) return;
+            
+            // Stop timer
+            clearInterval(callTimerInterval);
+            
+            // Reset agent status
+            statusIndicator.className = 'status-indicator status-available';
+            statusText.textContent = 'Available';
+            callTimer.textContent = '00:00';
+            
+            // Clear active call
+            activeCall = null;
+            
+            // Update buttons
+            endCallBtn.disabled = true;
+            answerCallBtn.disabled = callQueue.length > 0;
+        }
+        
+        function startCallTimer() {
+            let seconds = 0;
+            callTimer.textContent = '00:00';
+            
+            clearInterval(callTimerInterval);
+            
+            callTimerInterval = setInterval(() => {
+                seconds++;
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                callTimer.textContent = `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }, 1000);
+        }
+        
+        function updateQueueDisplay() {
+            queueList.innerHTML = '';
+            
+            if (callQueue.length === 0) {
+                queueList.innerHTML = '<li class="empty-queue">No calls in queue</li>';
+                return;
+            }
+            
+            callQueue.forEach((call, index) => {
+                const li = document.createElement('li');
+                li.className = 'caller-item';
+                if (index === 0) {
+                    li.classList.add('active');
+                }
+                
+                const waitTime = Math.floor((new Date() - call.time) / 1000);
+                const minutes = Math.floor(waitTime / 60);
+                const seconds = waitTime % 60;
+                
+                li.innerHTML = `
+                    <div class="caller-info">
+                        <span class="caller-number">${call.id}</span>
+                        <span class="caller-time">${call.time.toLocaleTimeString()}</span>
+                    </div>
+                    <span class="caller-status">${minutes}m ${seconds}s</span>
+                `;
+                
+                queueList.appendChild(li);
+            });
+        }
+        
+        function updateStats() {
+            totalCallsEl.textContent = callCounter;
+            waitingCallsEl.textContent = callQueue.length;
+            answeredCallsEl.textContent = answeredCalls;
+            
+            // Calculate average wait time
+            if (answeredCalls > 0) {
+                const avgWaitSeconds = Math.floor(totalWaitTime / answeredCalls);
+                const avgMinutes = Math.floor(avgWaitSeconds / 60);
+                const avgSeconds = avgWaitSeconds % 60;
+                avgWaitTimeEl.textContent = `${avgMinutes}:${avgSeconds.toString().padStart(2, '0')}`;
+            } else {
+                avgWaitTimeEl.textContent = '0:00';
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>⚡ Turbo Park 🏁</title>
+    <style>
+        :root {
+            --primary: #2A75BB;
+            --secondary: #3D7DCA;
+            --dark: #1A1A1A;
+            --light: #F5F5F5;
+            --accent: #FFCB05;
+            --text: #333333;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light);
+            color: var(--text);
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin-bottom: 5px;
+            font-size: 2.5em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 25px;
+            font-weight: 300;
+        }
+
+        .parking-lot {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 30px 0;
+        }
+
+        .parking-spot {
+            height: 90px;
+            background-color: white;
+            border-radius: 4px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: all 0.3s ease;
+            border: 2px solid #E0E0E0;
+            position: relative;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .parking-spot.occupied {
+            background-color: #F0F8FF;
+            border: 2px solid var(--primary);
+        }
+
+        .spot-number {
+            font-size: 11px;
+            color: #999;
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            font-weight: bold;
+        }
+
+        .car-icon {
+            width: 30px;
+            height: 30px;
+            margin-bottom: 8px;
+            background-color: var(--primary);
+            border-radius: 4px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 16px;
+        }
+
+        .license-plate {
+            font-size: 10px;
+            background-color: var(--dark);
+            color: white;
+            padding: 3px 8px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            letter-spacing: 1px;
+        }
+
+        .controls {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #EEE;
+        }
+
+        input, button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 4px;
+            margin: 5px;
+            font-family: 'Roboto', sans-serif;
+            font-size: 14px;
+        }
+
+        input {
+            width: 180px;
+            text-align: center;
+            border: 1px solid #DDD;
+            background-color: #FAFAFA;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        button:hover {
+            background-color: #1C5A9C;
+            transform: translateY(-1px);
+        }
+
+        #unparkBtn {
+            background-color: var(--dark);
+        }
+
+        #unparkBtn:hover {
+            background-color: #333;
+        }
+
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 20px;
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            border: 1px solid #EEE;
+        }
+
+        .stat-box {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 26px;
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: var(--dark);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 4px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+            transform: translateX(200%);
+            transition: transform 0.3s ease;
+            font-size: 14px;
+        }
+
+        .notification.show {
+            transform: translateX(0);
+        }
+
+        .header-icon {
+            font-size: 28px;
+            vertical-align: middle;
+            margin: 0 5px;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <h1><span class="header-icon">⚡</span> Turbo Park <span class="header-icon">🏁</span></h1>
+    <div class="subtitle">High-tech parking management system</div>
+
+    <div class="parking-lot" id="parkingLot">
+        <!-- Parking spots will be generated by JS -->
+    </div>
+
+    <div class="controls">
+        <input type="text" id="licenseInput" placeholder="Enter license plate" maxlength="8">
+        <button id="parkBtn">Park Vehicle</button>
+        <button id="unparkBtn">Unpark Vehicle</button>
+    </div>
+
+    <div class="stats">
+        <div class="stat-box">
+            <div class="stat-number" id="totalSpots">20</div>
+            <div class="stat-label">Total Spots</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number" id="availableSpots">20</div>
+            <div class="stat-label">Available</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number" id="occupiedSpots">0</div>
+            <div class="stat-label">Occupied</div>
+        </div>
+    </div>
+
+    <div class="notification" id="notification">
+        Notification message here
+    </div>
+
+    <script>
+        // Parking system variables
+        const parkingSpots = Array(20).fill(null);
+        const carIcons = ['🚗', '🚙', '🚕', '🚓', '🏎️', '🚚', '🚑', '🚛', '🚜', '🛻'];
+        const parkingLot = document.getElementById('parkingLot');
+        const licenseInput = document.getElementById('licenseInput');
+        const parkBtn = document.getElementById('parkBtn');
+        const unparkBtn = document.getElementById('unparkBtn');
+        const totalSpots = document.getElementById('totalSpots');
+        const availableSpots = document.getElementById('availableSpots');
+        const occupiedSpots = document.getElementById('occupiedSpots');
+        const notification = document.getElementById('notification');
+
+        // Initialize parking lot
+        function initParkingLot() {
+            parkingLot.innerHTML = '';
+            parkingSpots.forEach((spot, index) => {
+                const spotElement = document.createElement('div');
+                spotElement.className = 'parking-spot';
+                spotElement.dataset.spotNumber = index + 1;
+                
+                const spotNumber = document.createElement('div');
+                spotNumber.className = 'spot-number';
+                spotNumber.textContent = index + 1;
+                
+                spotElement.appendChild(spotNumber);
+                
+                if (spot) {
+                    spotElement.classList.add('occupied');
+                    const carIcon = document.createElement('div');
+                    carIcon.className = 'car-icon';
+                    carIcon.textContent = spot.icon;
+                    
+                    const licensePlate = document.createElement('div');
+                    licensePlate.className = 'license-plate';
+                    licensePlate.textContent = spot.license;
+                    
+                    spotElement.appendChild(carIcon);
+                    spotElement.appendChild(licensePlate);
+                }
+                
+                parkingLot.appendChild(spotElement);
+            });
+            
+            updateStats();
+        }
+
+        // Park a vehicle
+        function parkVehicle() {
+            const license = licenseInput.value.trim().toUpperCase();
+            
+            if (!license) {
+                showNotification('Please enter a license plate');
+                return;
+            }
+            
+            if (license.length < 3) {
+                showNotification('License too short (min 3 chars)');
+                return;
+            }
+            
+            const emptySpotIndex = parkingSpots.findIndex(spot => spot === null);
+            
+            if (emptySpotIndex === -1) {
+                showNotification('Parking lot is full!');
+                return;
+            }
+            
+            const randomIcon = carIcons[Math.floor(Math.random() * carIcons.length)];
+            parkingSpots[emptySpotIndex] = {
+                license: license,
+                icon: randomIcon
+            };
+            
+            licenseInput.value = '';
+            initParkingLot();
+            showNotification(`Parked in spot ${emptySpotIndex + 1}`);
+        }
+
+        // Unpark a vehicle
+        function unparkVehicle() {
+            const license = licenseInput.value.trim().toUpperCase();
+            
+            if (!license) {
+                showNotification('Please enter a license plate');
+                return;
+            }
+            
+            const spotIndex = parkingSpots.findIndex(spot => spot && spot.license === license);
+            
+            if (spotIndex === -1) {
+                showNotification('Vehicle not found');
+                return;
+            }
+            
+            parkingSpots[spotIndex] = null;
+            licenseInput.value = '';
+            initParkingLot();
+            showNotification(`${license} has left spot ${spotIndex + 1}`);
+        }
+
+        // Update statistics
+        function updateStats() {
+            const total = parkingSpots.length;
+            const occupied = parkingSpots.filter(spot => spot !== null).length;
+            const available = total - occupied;
+            
+            occupiedSpots.textContent = occupied;
+            availableSpots.textContent = available;
+        }
+
+        // Show notification
+        function showNotification(message) {
+            notification.textContent = message;
+            notification.classList.add('show');
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        // Event listeners
+        parkBtn.addEventListener('click', parkVehicle);
+        unparkBtn.addEventListener('click', unparkVehicle);
+        licenseInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                parkVehicle();
+            }
+        });
+
+        // Initialize
+        initParkingLot();
+    </script>
+</body>
+</html>

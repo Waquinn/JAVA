@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Parking System</title>
+    <link rel="stylesheet" href="design.css" />
+    <style>
+        /* Additional styles for the checkout modal */
+        .checkout-modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+        }
+        .checkout-input {
+            width: 100%;
+            padding: 8px;
+            margin: 10px 0;
+            box-sizing: border-box;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">PARKING SYSTEM</div>
+
+    <div class="container">
+        <!-- LEFT PANEL (Parking Fee Display) -->
+        <div class="left-panel panel">
+            <div class="section-title">Current Parking Fees</div>
+            <div id="feeResult" class="box fee-result">
+                <div class="fee-amount">Parking Fee: ₱<span id="feeAmount">0.00</span></div>
+                <div class="breakdown-title">Breakdown:</div>
+                <div id="feeBreakdown" class="fee-breakdown">Vehicles Parked: <span id="vehicleCounter">0</span></div>
+                <div id="parkingDuration" class="parking-duration"></div>
+            </div>
+        </div>
+
+        <!-- RIGHT PANEL (Parked Vehicles and Controls) -->
+        <div class="right-panel panel">
+            <div class="section-title">🚗 Parked Vehicles 🏍️</div>
+            <div id="parkedVehiclesList" class="box parked-vehicles">
+                No vehicles currently parked
+            </div>
+
+            <div class="button-group" style="margin-top: 20px;">
+                <button onclick="showAddVehicleModal()" class="action-button">+ Add Vehicle</button>
+                <button onclick="showCheckoutModal()" class="action-button">Checkout Vehicle</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Vehicle Modal -->
+    <div id="addVehicleModal" class="modal hidden">
+        <div class="modal-content">
+            <h3>Add New Vehicle</h3>
+            <div class="form-group">
+                <label>Vehicle Type:</label>
+                <select id="newVehicleType" class="form-select">
+                    <option value="regular">Regular Vehicle</option>
+                    <option value="motorcycle">Motorcycle</option>
+                </select>
+            </div>
+            <div class="modal-buttons">
+                <button onclick="addVehicle()">Confirm</button>
+                <button onclick="hideModal('addVehicleModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Checkout Modal -->
+    <div id="checkoutModal" class="modal hidden">
+        <div class="checkout-modal-content">
+            <h3>Checkout Vehicle</h3>
+            <div id="checkoutVehicleList"></div>
+            <input type="datetime-local" id="checkoutTime" class="checkout-input">
+            <div class="modal-buttons">
+                <button onclick="processCheckout()">Calculate Final Fee</button>
+                <button onclick="hideModal('checkoutModal')">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Overnight Modal -->
+    <div id="overnightModal" class="modal hidden">
+        <div class="modal-content">
+            <p>Do you need overnight parking?</p>
+            <div class="modal-buttons">
+                <button onclick="handleOvernightChoice(true)">Yes</button>
+                <button onclick="handleOvernightChoice(false)">No</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Final Fee Modal -->
+    <div id="finalFeeModal" class="modal hidden">.
+        <div class="modal-content">
+            <h3>Checkout Complete</h3>
+            <p id="finalFeeText"></p>
+            <div class="modal-buttons">
+                <button onclick="hideModal('finalFeeModal')">OK</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="backend.js"></script>
+</body>
+</html>

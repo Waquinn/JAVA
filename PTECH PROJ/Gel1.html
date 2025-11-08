@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Bakery Queue (FCFS)</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff0f6;
+      margin: 0;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      color: #a05278;
+    }
+
+    h1 {
+      color: #d63384;
+    }
+
+    .queue-container {
+      background: #ffe3ec;
+      padding: 1.5rem;
+      border-radius: 1.5rem;
+      width: 300px;
+      box-shadow: 0 4px 8px rgba(214, 51, 132, 0.1);
+    }
+
+    .queue {
+      list-style: none;
+      padding: 0;
+      margin-top: 1rem;
+    }
+
+    .queue li {
+      background: #fff;
+      margin: 0.5rem 0;
+      padding: 0.8rem;
+      border-radius: 1rem;
+      border: 1px solid #f8d7e1;
+      text-align: center;
+      font-weight: bold;
+    }
+
+    button {
+      margin: 0.5rem;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 1rem;
+      background-color: #f783ac;
+      color: white;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background-color 0.2s;
+    }
+
+    button:hover {
+      background-color: #f06595;
+    }
+  </style>
+</head>
+<body>
+  <h1>🍪 Bakery Queue</h1>
+  <div class="queue-container">
+    <button onclick="joinQueue()">👧 Join Queue</button>
+    <button onclick="serveCustomer()">🍬 Serve</button>
+    <ul class="queue" id="queueList"></ul>
+  </div>
+
+  <script>
+    let queue = [];
+    let customerNumber = 1;
+
+    function joinQueue() {
+      const name = `Customer #${customerNumber++}`;
+      queue.push(name);
+      renderQueue();
+    }
+
+    function serveCustomer() {
+      if (queue.length > 0) {
+        alert(`${queue[0]} has been served!`);
+        queue.shift();
+        renderQueue();
+      } else {
+        alert('No customers in queue!');
+      }
+    }
+
+    function renderQueue() {
+      const queueList = document.getElementById('queueList');
+      queueList.innerHTML = '';
+      queue.forEach((customer) => {
+        const li = document.createElement('li');
+        li.textContent = customer;
+        queueList.appendChild(li);
+      });
+    }
+  </script>
+</body>
+</html>

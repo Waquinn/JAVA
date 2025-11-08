@@ -1,0 +1,79 @@
+<style>
+.dashboard-section {
+  background: white;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.summary-cards {
+  display: flex;
+  gap: 20px;
+  margin: 20px 0;
+}
+
+.card {
+  flex: 1;
+  background: #ecf0f1;
+  padding: 15px;
+  border-radius: 6px;
+  text-align: center;
+}
+
+.card h4 {
+  margin-bottom: 10px;
+}
+
+.quick-actions button {
+  margin-right: 10px;
+  margin-top: 10px;
+}
+
+.recent-activity ul {
+  margin-top: 10px;
+  list-style-type: none;
+}
+
+.recent-activity li {
+  margin-bottom: 8px;
+}
+
+</style>
+
+<div class="dashboard-section">
+    <h3>Welcome back, Mike Bru!</h3>
+    <p>Here's a quick overview of your InfoConnect system.</p>
+  
+    <div class="summary-cards">
+      <div class="card">
+        <h4>Total Users</h4>
+        <p>152</p>
+      </div>
+      <div class="card">
+        <h4>New Users Today</h4>
+        <p>3</p>
+      </div>
+      <div class="card">
+        <h4>Pending Messages</h4>
+        <p>5</p>
+      </div>
+    </div>
+  
+    <div class="quick-actions">
+      <h4>Quick Actions</h4>
+      <button class="btn">➕ Add New Info</button>
+      <button class="btn">🔍 Search User</button>
+      <button class="btn">📤 Send Mail</button>
+    </div>
+  
+    <div class="recent-activity">
+      <h4>Recent Activity</h4>
+      <ul>
+        <li>✔️ Maria Santos was added — May 6, 2025</li>
+        <li>✏️ Juan Dela Cruz updated profile — May 6, 2025</li>
+        <li>📧 Message sent to Ana Lopez — May 5, 2025</li>
+      </ul>
+    </div>
+  </div>
+  
