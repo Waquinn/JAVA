@@ -16,7 +16,7 @@ import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 
-import javax.swing.text.html.ListView;
+
 
 // --------------------- DATA STRUCTURES ----------------------
 
@@ -88,6 +88,77 @@ class BinarySearchTree {
         inorder(root, result);
         return result;
     }
+
+    //🆕 NEW: Remove a room from the BST
+    void delete(String room) {
+        root = deleteRec(root, room);
+    }
+
+    Node deleteRec(Node root, String room) {
+        if (root == null) return null;
+
+        if (room.compareTo(root.room) < 0) {
+            root.left = deleteRec(root.left, room);
+        } else if (room.compareTo(root.room) > 0) {
+            root.right = deleteRec(root.right, room);
+        } else {
+            // Node found - delete it
+            if (root.left == null) return root.right;
+            if (root.right == null) return root.left;
+
+            // Node has two children: get smallest from right subtree
+            root.room = minValue(root.right);
+            root.right = deleteRec(root.right, root.room);
+        }
+        return root;
+    }
+
+    String minValue(Node node) {
+        String min = node.room;
+        while (node.left != null) {
+            min = node.left.room;
+            node = node.left;
+        }
+        return min;
+    }
+
+    //🆕 NEW: Visual tree representation
+    String visualizeTree() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("📊 BST Structure (Alphabetical Order):\n");
+        sb.append("─────────────────────────────────────\n");
+        if (root == null) {
+            sb.append("  [Empty Tree]\n");
+        } else {
+            visualizeNode(root, "", true, sb);
+        }
+        return sb.toString();
+    }
+
+    void visualizeNode(Node node, String prefix, boolean isTail, StringBuilder sb) {
+    if (node != null) {
+        sb.append(prefix)
+          .append(isTail ? "└── " : "├── ")
+          .append(node.room)
+          .append("\n");
+
+        // Collect non-null children
+        List<Node> children = new ArrayList<>();
+        if (node.left != null) children.add(node.left);
+        if (node.right != null) children.add(node.right);
+
+        // Loop through children
+        for (int i = 0; i < children.size(); i++) {
+            boolean lastChild = (i == children.size() - 1);
+            visualizeNode(children.get(i),
+                prefix + (isTail ? "    " : "│   "),
+                lastChild,
+                sb
+            );
+        }
+    }
+}
+
 }
 
 // --------------------- MAIN APPLICATION ----------------------
@@ -110,6 +181,9 @@ public class KeyRoomMonitor extends Application {
     //For visual presentation ng mga nahiram na susi
     private ListView<String> listView = new ListView<>(listItems);
 
+    //🆕 NEW: TextArea to show BST structure
+    private TextArea bstVisualArea = new TextArea();
+
     @Override
     public void start(Stage stage) {
         loadData();
@@ -120,13 +194,13 @@ public class KeyRoomMonitor extends Application {
         title.setFont(new Font("Arial", 24));
 
         TextField roomField = new TextField();
-        roomField.setPromptText("Room Number");
+        roomField.setPromptText("Room No.");
 
         TextField nameField = new TextField();
-        nameField.setPromptText("Borrower Name");
+        nameField.setPromptText("Borrower");
 
         TextField programField = new TextField();
-        programField.setPromptText("Program/Course");
+        programField.setPromptText("Program");
 
         TextField yearSecField = new TextField();
         yearSecField.setPromptText("Year & Section");
@@ -136,13 +210,20 @@ public class KeyRoomMonitor extends Application {
         Button addBtn = new Button("➕ Add Key");
         Button returnBtn = new Button("🔁 Return Key");
         Button refreshBtn = new Button("🔄 Refresh List");
+        Button showTreeBtn = new Button("🌲 Show BST"); //🆕 NEW button
 
         // Components is arranged horizontally, with padding para mas maganda tignan
-        HBox inputBox = new HBox(10, roomField, nameField, programField, yearSecField, addBtn, returnBtn, refreshBtn);
+        HBox inputBox = new HBox(10, roomField, nameField, programField, yearSecField, addBtn, returnBtn, refreshBtn, showTreeBtn);
         inputBox.setPadding(new Insets(10));
 
+        //🆕 NEW: BST visualization area
+        bstVisualArea.setEditable(false);
+        bstVisualArea.setPrefHeight(200);
+        bstVisualArea.setFont(Font.font("Courier New", 12));
+        bstVisualArea.setStyle("-fx-control-inner-background: #f5f5f5;");
+
         // Components is arranged vertically, with padding para mas maganda tignan
-        VBox layout = new VBox(10, title, inputBox, listView);
+        VBox layout = new VBox(10, title, inputBox, new Label("📋 Active Borrowed Keys (Sorted):"), listView, bstVisualArea);
         layout.setPadding(new Insets(15));
         layout.getStyleClass().add("root");
 
@@ -184,7 +265,8 @@ public class KeyRoomMonitor extends Application {
             KeyRecord record = new KeyRecord(room, borrowerName, program, yearSec, time);
             activeKeys.put(room, record);
             keyLog.insert(room);
-            refreshList();
+            refreshList(); //🆕 Now displays in sorted order!
+            updateBSTVisualization(); //🆕 Update tree view
             saveData();
             roomField.clear();
             nameField.clear();
@@ -194,6 +276,7 @@ public class KeyRoomMonitor extends Application {
 
 
         //Gets the selected key in the list.
+        //🆕 CHANGED: Now also removes from BST
         //Removes it from the HashMap.
         //Updates the list and file.
         returnBtn.setOnAction(e -> {
@@ -205,15 +288,22 @@ public class KeyRoomMonitor extends Application {
 
             String room = selected.split(" - ")[0];
             activeKeys.remove(room);
+            keyLog.delete(room); //🆕 Remove from BST too!
             refreshList();
+            updateBSTVisualization(); //🆕 Update tree view
             saveData();
         });
 
         //Updates the list with the latest data
         refreshBtn.setOnAction(e -> refreshList());
+        
+        //🆕 NEW: Show BST structure button
+        showTreeBtn.setOnAction(e -> updateBSTVisualization());
+        
         refreshList();
+        updateBSTVisualization(); //🆕 Show initial tree
 
-        Scene scene = new Scene(layout, 1000, 550);
+        Scene scene = new Scene(layout, 1000, 700); //🆕 Increased height
         scene.getStylesheets().add("style.css");
         stage.setScene(scene);
         stage.setTitle("Key Room Monitor");
@@ -221,15 +311,24 @@ public class KeyRoomMonitor extends Application {
         stage.show();
     }
 
-    //Clears and reloads the list from activeKeys.
+    //🆕 CHANGED: Now uses BST to display in SORTED order!
     private void refreshList() {
         listItems.clear();
-        for (KeyRecord record : activeKeys.values()) {
-            listItems.add(record.toString());
+        List<String> sortedRooms = keyLog.getInorder(); // Get rooms in alphabetical order
+        for (String room : sortedRooms) {
+            KeyRecord record = activeKeys.get(room);
+            if (record != null) {
+                listItems.add(record.toString());
+            }
         }
     }
 
-    //Writes all records into a file (keys_data.txt) so they’re not lost when you close the app.
+    //🆕 NEW: Update BST visualization
+    private void updateBSTVisualization() {
+        bstVisualArea.setText(keyLog.visualizeTree());
+    }
+
+    //Writes all records into a file (keys_data.txt) so they're not lost when you close the app.
     private void saveData() {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(DATA_FILE))) {
             for (KeyRecord record : activeKeys.values()) {
@@ -242,24 +341,51 @@ public class KeyRoomMonitor extends Application {
     }
 
     //Reads saved data from the text file when the program starts, so previously borrowed keys are reloaded.
-    private void loadData() {
-        File file = new File(DATA_FILE);
-        if (!file.exists()) return;
+   // Reads saved data from the text file when the program starts, so previously borrowed keys are reloaded.
+private void loadData() {
+    File file = new File(DATA_FILE);
+    if (!file.exists()) return;
 
-        try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-            String line;
-            while ((line = reader.readLine()) != null) {
-                String[] parts = line.split(",", 5);
-                if (parts.length == 5) {
-                    KeyRecord record = new KeyRecord(parts[0], parts[1], parts[2], parts[3], parts[4]);
-                    activeKeys.put(parts[0], record);
-                    keyLog.insert(parts[0]);
-                }
+    try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+        String line;
+        List<String> tempRooms = new ArrayList<>();
+
+        // Read each line and store activeKeys and temporary room names
+        while ((line = reader.readLine()) != null) {
+            String[] parts = line.split(",", 5);
+            if (parts.length == 5) {
+                KeyRecord record = new KeyRecord(parts[0], parts[1], parts[2], parts[3], parts[4]);
+                activeKeys.put(parts[0], record);
+                tempRooms.add(parts[0]); // collect rooms to build balanced BST
             }
-        } catch (IOException e) {
-            System.out.println("Error loading data: " + e.getMessage());
         }
+
+        // Sort alphabetically
+        Collections.sort(tempRooms);
+
+        // Build a balanced BST from sorted rooms
+        buildBalancedBST(tempRooms, 0, tempRooms.size() - 1);
+
+    } catch (IOException e) {
+        System.out.println("Error loading data: " + e.getMessage());
     }
+}
+
+// Recursive helper to build balanced BST
+private void buildBalancedBST(List<String> rooms, int start, int end) {
+    if (start > end) return;
+
+    int mid = (start + end) / 2;
+
+    // Insert the middle element first for balanced structure
+    keyLog.insert(rooms.get(mid));
+
+    // Recursively insert left and right halves
+    buildBalancedBST(rooms, start, mid - 1);
+    buildBalancedBST(rooms, mid + 1, end);
+}
+
+
 
     //Shows pop-up messages for user notifications.
     private void showAlert(String msg) {

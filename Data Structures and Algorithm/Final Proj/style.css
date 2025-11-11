@@ -1,0 +1,30 @@
+.root {
+    -fx-background-color: #f9f9f9;
+}
+
+.label {
+    -fx-text-fill: #333;
+}
+
+.button {
+    -fx-background-color: #e0f0ff;
+    -fx-text-fill: #003366;
+    -fx-font-weight: bold;
+    -fx-background-radius: 6;
+    -fx-padding: 6 14;
+    -fx-border-color: #a0cfff;
+    -fx-border-radius: 6;
+    -fx-min-width: 140px;  
+    -fx-alignment: CENTER; 
+}
+
+.button:hover {
+    -fx-background-color: #d0e8ff;
+}
+
+.list-view {
+    -fx-background-color: white;
+    -fx-border-color: #ddd;
+    -fx-border-radius: 6;
+    -fx-padding: 8;
+}
